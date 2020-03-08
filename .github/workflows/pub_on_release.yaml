@@ -34,8 +34,7 @@ jobs:
       TOKEN: ${{ secrets.DOCKER_TOKEN }}
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
       NAME: ${{ secrets.DOCKER_NAME }}
-      CONTAINER_IMAGE: docker.pkg.github.com/${{github.repository}}/${{secrets.DOCKER_NAME}}:${{github.sha}}
-      CONTAINER_IMAGE_LATEST: docker.pkg.github.com/${{github.repository}}/${{secrets.DOCKER_NAME}}:latest
+      CONTAINER_IMAGE_LATEST: docker.pkg.github.com/timopheym/actions_ci_example/${{secrets.DOCKER_NAME}}:latest
     steps:
       - name: Login to GitHub Packages
         # Сначала мы логинимся в github packages
@@ -44,18 +43,7 @@ jobs:
       - uses: actions/checkout@master
       - name: Build image
         # Собираем image
-        run: docker build -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+        run: docker build -t $CONTAINER_IMAGE_LATEST .
       - name: Push image 
         # Пушим образ в registry
         run: docker push $CONTAINER_IMAGE_LATEST
-
-  deploy:
-    # Если мы успешно собрали контейнер и отправили в registry, то делаем хук деплоймент серверу
-    # Попробуем готовый экшен curl из маркетплэйса
-    needs: [build_and_pub]
-    runs-on: [ubuntu-latest]
-    steps:
-      - name: Set tag to env
-        run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:11})
-      - name: Send webhook for deploy
-        run: "curl --silent --show-error --fail -X POST ${{ secrets.DEPLOYMENT_SERVER }} -H 'Authorization: ${{ secrets.DEPLOYMENT_TOKEN }}' -H 'Content-Type: application/json' -d '{\"owner\": \"${{ secrets.DOCKER_LOGIN }}\", \"repository\": \"${{ secrets.DOCKER_NAME }}\", \"tag\": \"${{ env.RELEASE_VERSION }}\", \"ports\": {\"8080\": 8080}}'"
