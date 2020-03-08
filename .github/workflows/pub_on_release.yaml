@@ -33,8 +33,7 @@ jobs:
     env:
       TOKEN: ${{ secrets.DOCKER_TOKEN }}
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
-      NAME: ${{ secrets.DOCKER_NAME }}
-      CONTAINER_IMAGE_LATEST: docker.pkg.github.com/timopheym/actions_ci_example/${{secrets.DOCKER_NAME}}:latest
+      CONTAINER_IMAGE_LATEST: docker.pkg.github.com/timopheym/actions_ci_example/service:latest
     steps:
       - name: Login to GitHub Packages
         # Сначала мы логинимся в github packages
@@ -43,7 +42,7 @@ jobs:
       - uses: actions/checkout@master
       - name: Build image
         # Собираем image
-        run: docker build -t $CONTAINER_IMAGE_LATEST .
+        run: docker build -t $CONTAINER_IMAGE_LATEST -f Dockerfile .
       - name: Push image 
         # Пушим образ в registry
         run: docker push $CONTAINER_IMAGE_LATEST
