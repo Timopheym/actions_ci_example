@@ -31,20 +31,23 @@ jobs:
     needs: [run_tests]
     runs-on: [ubuntu-latest]
     env:
+      TOKEN: ${{ secrets.DOCKER_TOKEN }}
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
       NAME: ${{ secrets.DOCKER_NAME }}
+      CONTAINER_IMAGE: docker.pkg.github.com/${{github.repository}}/${{secrets.DOCKER_NAME}}:${{github.sha}}
+      CONTAINER_IMAGE_LATEST: docker.pkg.github.com/${{github.repository}}/${{secrets.DOCKER_NAME}}:latest
     steps:
       - name: Login to GitHub Packages
         # Сначала мы логинимся в github packages
-        run: docker login -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_TOKEN }} docker.pkg.github.com
+        run: docker login -u $LOGIN -p $TOKEN docker.pkg.github.com
         # Чекаутим код
       - uses: actions/checkout@master
       - name: Build image
-        # Собираем image и называем его так как указано в hub.docker т.е. login/repository:version
-        run: docker build -t $LOGIN/$NAME:${GITHUB_REF:11} -f Dockerfile .
-      - name: Push image to docker.io
+        # Собираем image
+        run: docker build -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+      - name: Push image 
         # Пушим образ в registry
-        run: docker push $LOGIN/$NAME:${GITHUB_REF:11}
+        run: docker push $CONTAINER_IMAGE_LATEST
 
   deploy:
     # Если мы успешно собрали контейнер и отправили в registry, то делаем хук деплоймент серверу
