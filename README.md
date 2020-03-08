@@ -1,6 +1,5 @@
 # Playing with github actions
-![Publish on Docker Hub and Deploy](https://github.com/Timopheym/actions_ci_example/workflows/Publish%20on%20Docker%20Hub%20and%20Deploy/badge.svg)
-
+![Publish on Docker Hub and Deploy](https://github.com/Timopheym/actions_ci_example/workflows/Publish%20on%20Docker%20Hub%20and%20Deploy/badge.svg?event=release)
 ## 0. Why
 Пробуем создвть свой CI/CD пайплайн для домашнего проекта при помощи Python и GitHub Actions<br/>
 
